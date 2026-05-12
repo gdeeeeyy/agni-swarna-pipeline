@@ -4,8 +4,8 @@ import torch
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from tqdm import tqdm
-from Stage3.src.model import SmallUNet
-from Stage3.src.dataset import EdgeDataset, get_transforms
+from .model import SmallUNet
+from .dataset import EdgeDataset, get_transforms
 import torch.nn as nn
 import numpy as np
 import pandas as pd
@@ -37,6 +37,43 @@ def boundary_iou(pred_mask, true_mask):
     inter  = np.logical_and(pred_b, true_b).sum()
     union  = np.logical_or(pred_b,  true_b).sum()
     return inter / (union + 1e-6)
+
+
+# ── Trainer Class & Helper ───────────────────────────────────────────────────
+
+class Trainer:
+    def __init__(self, cfg):
+        self.cfg = cfg
+
+    def fit(self):
+        run_stage3_training(
+            train_input=self.cfg['train_input'],
+            train_target=self.cfg['train_target'],
+            val_input=self.cfg['val_input'],
+            val_target=self.cfg['val_target'],
+            checkpoint_dir=self.cfg['checkpoint_dir'],
+            img_size=self.cfg.get('img_size', 512),
+            batch_size=self.cfg.get('batch_size', 24),
+            lr=self.cfg.get('lr', 3e-3),
+            epochs=self.cfg.get('epochs', 60),
+            base_c=self.cfg.get('base_c', 64),
+            csv_path=self.cfg.get('csv_path', None)
+        )
+
+def default_cfg():
+    return {
+        'train_input': './data/train/input',
+        'train_target': './data/train/target',
+        'val_input': './data/val/input',
+        'val_target': './data/val/target',
+        'checkpoint_dir': './checkpoints',
+        'img_size': 512,
+        'batch_size': 24,
+        'lr': 3e-3,
+        'epochs': 60,
+        'base_c': 64,
+        'csv_path': None
+    }
 
 
 # ── Main training function ─────────────────────────────────────────────────────

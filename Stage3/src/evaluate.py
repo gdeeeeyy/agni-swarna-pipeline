@@ -3,7 +3,7 @@ import cv2
 import torch
 import numpy as np
 from tqdm import tqdm
-from model import SmallUNet
+from .model import SmallUNet
 from torch.utils.data import Dataset, DataLoader
 
 # Dataset 

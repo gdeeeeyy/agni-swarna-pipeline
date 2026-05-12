@@ -5,7 +5,7 @@ import numpy as np
 from pathlib import Path
 from tqdm import tqdm
 
-from model import SmallUNet
+from .model import SmallUNet
 
 
 ROOT_STAGE3 = Path(__file__).resolve().parents[1]
@@ -13,6 +13,13 @@ MODEL_PATH = ROOT_STAGE3 / "checkpoints" / "best_unet.pth"
 
 IMG_SIZE = 512
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+
+def infer_folder(model_path, input_folder, output_folder):
+    """
+    Alias for run_stage3 to match stage3.py expectation.
+    """
+    return run_stage3(input_folder, Path(output_folder).parent, model_path)
 
 
 def run_stage3(input_mask_dir: str, parent_output_dir: str, model_path: str = None):
