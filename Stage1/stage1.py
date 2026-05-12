@@ -12,7 +12,7 @@ def parse_args():
     parser.add_argument("--input_dir", required=True)
     parser.add_argument("--output_dir", required=True)
 
-    parser.add_argument("--csv_path", required=False)
+    parser.add_argument("--csv_path", help="Path to labels CSV (required for train_infer mode)")
 
     parser.add_argument("--epochs", type=int, default=20)
     parser.add_argument("--batch_size", type=int, default=16)
@@ -33,13 +33,12 @@ def main():
     output_dir = Path(args.output_dir).resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    csv_path = (
-        Path(args.csv_path).resolve()
-        if args.csv_path
-        else Path(__file__).resolve().parent / "data" / "final_cleaned_image_sequence_cycles_11to20_79_80.csv"
-    )
-
     if args.mode == "train_infer":
+        if not args.csv_path:
+            raise ValueError("--csv_path is required for Stage 1 training (train_infer mode)")
+        
+        csv_path = Path(args.csv_path).resolve()
+
         best_model_path = train_kfold(
             csv_path=str(csv_path),
             img_dir=str(input_dir),

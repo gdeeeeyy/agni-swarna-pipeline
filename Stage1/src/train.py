@@ -17,10 +17,7 @@ from PIL import Image
 from tqdm import tqdm
 
 
-DEFAULT_CSV_PATH = "data/final_cleaned_image_sequence.csv"
-DEFAULT_IMG_DIR = "data/output_baseline"
-DEFAULT_SAVE_DIR = "results"
-
+# Removed hardcoded defaults for CSV paths and data directories
 DEFAULT_EPOCHS = 20
 DEFAULT_BATCH_SIZE = 16
 DEFAULT_LR = 1e-4
@@ -29,9 +26,9 @@ DEFAULT_SEED = 42
 
 
 def train_kfold(
-    csv_path=DEFAULT_CSV_PATH,
-    img_dir=DEFAULT_IMG_DIR,
-    save_dir=DEFAULT_SAVE_DIR,
+    csv_path,
+    img_dir,
+    save_dir,
     epochs=DEFAULT_EPOCHS,
     batch_size=DEFAULT_BATCH_SIZE,
     lr=DEFAULT_LR,
@@ -137,11 +134,7 @@ def train_kfold(
             global_best_acc = best_acc
             global_best_model_path = best_model_path
 
-    # Copy the global best fold model to save_dir/best_model.pth
-    best_model_final = save_dir / "best_model.pth"
-    shutil.copy2(global_best_model_path, best_model_final)
-    print(f"Best model saved to: {best_model_final}")
-
+        # Confusion Matrix
         cm = confusion_matrix(targets, preds)
         disp = ConfusionMatrixDisplay(cm, display_labels=["Usable", "Unusable"])
         disp.plot(cmap="Blues", values_format="d")
@@ -149,6 +142,7 @@ def train_kfold(
         plt.savefig(save_dir / "plots" / f"cm_fold{fold + 1}.png")
         plt.close()
 
+        # History Plot
         plt.figure(figsize=(10, 4))
         plt.subplot(1, 2, 1)
         plt.plot(history["train_loss"], label="Train Loss")
@@ -165,6 +159,12 @@ def train_kfold(
         plt.savefig(save_dir / "plots" / f"train_curve_fold{fold + 1}.png")
         plt.close()
 
+    # Copy the global best fold model to save_dir/best_model.pth
+    best_model_final = save_dir / "best_model.pth"
+    shutil.copy2(global_best_model_path, best_model_final)
+    print(f"Best model saved to: {best_model_final}")
+
+    # Final inference using best model
     model = get_resnet34(num_classes=2, pretrained=False).to(device)
     model.load_state_dict(torch.load(global_best_model_path, map_location=device, weights_only=False))
     model.eval()
@@ -211,4 +211,5 @@ def train_kfold(
 
 
 if __name__ == "__main__":
-    train_kfold()
+    # Script mode disabled as it now requires arguments
+    print("Please run this via stage1.py or provide arguments to train_kfold()")

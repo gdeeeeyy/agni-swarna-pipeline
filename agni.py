@@ -105,6 +105,8 @@ def _stage1(args, input_dir, stage1_out):
         "--lr",         str(args.s1_lr),
         "--kfolds",     str(args.s1_kfolds),
     ]
+    if args.csv_path:
+        cmd += ["--csv_path", str(args.csv_path)]
     if args.mode == "infer" and args.s1_model:
         cmd += ["--model_path", args.s1_model]
     _run(cmd)
@@ -198,6 +200,8 @@ def run_pipeline(args):
     if args.stage in ("1", "all"):
         if not input_dir or not output_dir:
             raise ValueError("--input_dir and --output_dir are required for Stage 1")
+        if args.mode == "train_infer" and not args.csv_path:
+            raise ValueError("--csv_path is required for Stage 1 training (train_infer mode)")
         _stage1(args, input_dir, stage1_out)
 
     # ── Stage 2 ──────────────────────────────────────────────────────────────

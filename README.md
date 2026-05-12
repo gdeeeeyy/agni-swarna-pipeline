@@ -122,9 +122,10 @@ rm -rf pymp-* tmp*
 python agni.py \
   --stage all \
   --mode train_infer \
-  --input_dir /path/to/images \
-  --output_dir /path/to/results \
-  --mask_dir /path/to/ground_truth_masks \
+  --input_dir output_baseline \
+  --output_dir results \
+  --csv_path path/to/labels.csv \
+  --mask_dir white_boundaries \
   --min_img 1 \
   --max_img 20000 \
   --s1_epochs 20 \
